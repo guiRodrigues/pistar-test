@@ -28,6 +28,89 @@ https://github.com/jhcp/pistar
     <link href="app/ui/lib/bootstrap3-editable/bootstrap-editable.css" rel="stylesheet"> <!-- x-editable -->
     <!-- tool styles -->
     <link href="pistar.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Roboto:300,500');
+
+        @color-card-background: #2d3638;
+        @color-tag-background: #191e20;
+        @color-anchor: #e37544;
+        @color-body-copy: #b9bcbd;
+        @default-border-radius: 10px;
+        @breakpoint-medium: "screen and (min-width: 700px)";
+
+        html, body {
+        background-color: #fff;
+        }
+
+        .form-popup-bg {
+        position:absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-content: center;
+        justify-content: center;
+        }
+        .form-popup-bg {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        background-color: rgba(94, 110, 141, 0.9);
+        opacity: 0;
+        visibility: hidden;
+        -webkit-transition: opacity 0.3s 0s, visibility 0s 0.3s;
+        -moz-transition: opacity 0.3s 0s, visibility 0s 0.3s;
+        transition: opacity 0.3s 0s, visibility 0s 0.3s;
+        overflow-y: auto;
+        z-index: 10000;
+        }
+        .form-popup-bg.is-visible {
+        opacity: 1;
+        visibility: visible;
+        -webkit-transition: opacity 0.3s 0s, visibility 0s 0s;
+        -moz-transition: opacity 0.3s 0s, visibility 0s 0s;
+        transition: opacity 0.3s 0s, visibility 0s 0s;
+        }
+        .form-container {
+            background-color: #2d3638;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            position:relative;
+        padding: 40px;
+        color: #fff;
+        }
+        .close-button {
+        background:none;
+        color: #fff;
+        width: 40px;
+        height: 40px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        border: solid 1px #fff;
+        }
+
+        .form-popup-bg:before{
+            content:'';
+            background-color: #fff;
+        opacity: .25;
+        position:absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -123,6 +206,46 @@ https://github.com/jhcp/pistar
             <div class="menu-group">
                 <div class="menu-line">
                     <span id="add-internal-cells-palette" class="add-button"></span>
+                    <button id="btnOpenForm">+<br>Add new</button>
+                    <div class="form-popup-bg">
+                        <div class="form-container">
+                            <button id="btnCloseForm" class="close-button">X</button>
+                            <h1>Create a new Element</h1>
+                            <form id="create-element">
+                                <div class="form-group">
+                                    <label for="">Name</label>
+                                    <input id="element-name" type="text" class="form-control" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Form</label>
+                                    <input id="element-svg-path" class="form-control" type="text" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Icon</label>
+                                    <input id="element-image" class="form-control" type="file" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Type</label>
+                                    <select name="cars" id="cars">
+                                        <option value="link">Link</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Source</label>
+                                    <select name="cars" id="cars">
+                                        <option value="link">Goal</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="">Target</label>
+                                    <select name="cars" id="cars">
+                                        <option value="link">Goal</option>
+                                    </select>
+                                </div>
+                                <button type="submit">Create</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -531,6 +654,8 @@ https://github.com/jhcp/pistar
 
 </div>
 
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
+
 
 <!-- dependencies -->
 <script src="app/istarcore/lib/jquery.min.js"></script>
@@ -568,6 +693,55 @@ https://github.com/jhcp/pistar
 <!-- end of plugin(s) area -->
 
 <script src="app/ui/main.js"></script>
+
+<script>
+    function closeForm() {
+        $('.form-popup-bg').removeClass('is-visible');
+    }
+
+    $(document).ready(function ($) {
+
+        /* Contact Form Interactions */
+        $('#btnOpenForm').on('click', function (event) {
+            event.preventDefault();
+
+            console.log(event);
+
+            $('.form-popup-bg').addClass('is-visible');
+        });
+
+        $('#create-element').on('submit', function (event) {
+            event.preventDefault();
+
+            const elementProps = event;
+
+            const element = {
+                name: $('#element-name').val(),
+                path: $('#element-svg-path').val()
+            };
+
+            const createdElements = JSON.parse(localStorage.getItem('createdElements'));
+            if (!createdElements) {
+                localStorage.setItem('createdElements', JSON.stringify([element]));
+            } else {
+                createdElements.push(element);
+                localStorage.setItem('createdElements', JSON.stringify(createdElements));
+            }
+
+            console.log(event);
+        });
+
+        //close popup when clicking x or off popup
+        $('.form-popup-bg').on('click', function (event) {
+            if ($(event.target).is('.form-popup-bg') || $(event.target).is('#btnCloseForm')) {
+                event.preventDefault();
+
+                $(this).removeClass('is-visible');
+            }
+        });
+
+    });
+</script>
 
 </body>
 </html>
